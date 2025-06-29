@@ -1,0 +1,29 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Create Post - Gibly{% endblock %}
+
+{% block content %}
+<div class="create-post-container">
+    <h2>Create Post</h2>
+
+    <form method="POST" enctype="multipart/form-data" class="create-post-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="create-post-actions">
+            <button type="submit" class="btn-primary">Create Post</button>
+            <a href="{% url 'home' %}" class="btn-secondary">Back to Home</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,16 @@
+{% extends "main/base.html" %}
+{% block title %}Logged Out - Gibly{% endblock %}
+
+{% block content %}
+<div class="logout-container">
+    <div class="logout-icon" style="text-align:center; margin-bottom:18px;">
+        <i class="fas fa-sign-out-alt" style="font-size:48px; color:black;"></i>
+    </div>
+    <h2 style="text-align:center;">You have been logged out</h2>
+    <p style="text-align:center; color:#555;">Thanks for visiting Gibly. See you soon!</p>
+    <div class="logout-actions" style="display:flex; justify-content:center; gap:18px; margin-top:28px;">
+        <a href="{% url 'login' %}" class="btn-primary">Login Again</a>
+        <a href="{% url 'register' %}" class="btn-secondary">Create New Account</a>
+    </div>
+</div>
+{% endblock %}

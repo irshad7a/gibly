@@ -1,0 +1,61 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block title %}Edit Profile - Gibly{% endblock %}
+
+{% block content %}
+<div class="edit-profile-container">
+    <h2>Edit Profile</h2>
+    <form method="post" enctype="multipart/form-data" class="edit-profile-form">
+        {% csrf_token %}
+
+        <!-- Profile Picture Preview -->
+        <div class="profile-picture-preview">
+            {% if user.profile.profile_picture %}
+                <img id="profilePicPreview" src="{{ user.profile.profile_picture.url }}" alt="Profile Picture">
+            {% else %}
+                <img id="profilePicPreview" src="{% static 'main/default_profile.png' %}" alt="Profile Picture">
+            {% endif %}
+        </div>
+
+        <label for="id_profile_picture">Change Profile Picture</label>
+        {{ form.profile_picture }}
+
+        <label for="id_username">Username</label>
+        <p class="field-hint">Current: <strong>{{ user.username }}</strong></p>
+        {{ form.username }}
+
+        <label for="id_email">Email</label>
+        <input type="email" id="id_email" value="{{ user.email }}" disabled style="background:#e9ecef; color:#888;">
+
+        <label for="id_bio">Bio</label>
+        {{ form.bio }}
+
+        <div class="checkbox-row">
+            <input type="checkbox" id="id_checkbox_field" name="checkbox_field" {% if form.checkbox_field.value %}checked{% endif %}>
+            <label for="id_checkbox_field">Your Checkbox Label</label>
+        </div>
+
+        <div class="edit-profile-actions">
+            <button type="submit" class="btn-primary">Save Changes</button>
+<a href="{% url 'profile_by_username' user.username %}" class="btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<!-- JS for live profile picture preview -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('id_profile_picture');
+    const previewImg = document.getElementById('profilePicPreview');
+    if (fileInput && previewImg) {
+        fileInput.addEventListener('change', function(e) {
+            const [file] = fileInput.files;
+            if (file) {
+                previewImg.src = URL.createObjectURL(file);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

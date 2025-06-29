@@ -1,0 +1,84 @@
+{% extends "main/base.html" %}
+
+{% load static %}
+
+{% block title %}{{ user.username }}'s Profile - Gibly{% endblock %}
+
+{% block content %}
+<div class="profile-layout">
+
+    <!-- Left -->
+    <div class="profile-left">
+        {% if user.profile.profile_picture %}
+            <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-picture">
+        {% else %}
+            <i class="fas fa-user-circle profile_picture"></i>
+        {% endif %}
+
+        <h2 class="username">{{ user.username }}</h2>
+        <p class="bio">{{ user.profile.bio|default:" " }}</p>
+
+        <div class="stats">
+            <div><strong>{{ user.post_set.count }}</strong><br>Posts</div>
+            <div><strong>{{ user.followers.count }}</strong><br>Followers</div>
+            <div><strong>{{ user.profile.following.count }}</strong><br>Following</div>
+        </div>
+
+        <div class="profile-buttons">
+            {% if user == request.user %}
+                <a href="{% url 'edit_profile' %}" class="edit-profile-btn">Edit Profile</a>
+                <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-btn" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            {% else %}
+                {% if user in request.user.profile.following.all %}
+                    <button class="follow-toggle-btn unfollow-btn" data-user-id="{{ user.id }}">Following</button>
+                {% else %}
+                    <button class="follow-toggle-btn follow-btn" data-user-id="{{ user.id }}">Follow</button>
+                {% endif %}
+<a href="{% url 'chats' %}?to={{ user.username }}" class="message-btn">Message</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Right -->
+    <div class="profile-right">
+        <h3>All Posts</h3>
+        <div class="posts-grid">
+            {% for post in posts %}
+                <div class="post-card">
+                    <a href="{% url 'post_detail' post.id %}">
+                        <img src="{{ post.image.url }}" alt="Post image" class="post-image">
+                    </a>
+                    <div class="post-caption">{{ post.caption|truncatewords:15 }}</div>
+                </div>
+            {% empty %}
+                <p>No posts yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% comment %} <div class="profile-actions">
+    {% if user == request.user %}
+        <a href="{% url 'edit_profile' %}" class="btn edit-btn">Edit Profile</a>
+        <a href="{% url 'logout' %}" class="btn logout-btn">Logout</a>
+    {% else %}
+        {% if user in request.user.profile.following.all %}
+            <form method="post" action="{% url 'unfollow' user.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn unfollow-btn">Unfollow</button>
+            </form>
+        {% else %}
+            <form method="post" action="{% url 'follow' user.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn follow-btn">Follow</button>
+            </form>
+        {% endif %}
+        <a href="{% url 'messages' %}?to={{ user.username }}" class="btn message-btn">Message</a>
+    {% endif %}
+</div> {% endcomment %}
+{% endblock %}

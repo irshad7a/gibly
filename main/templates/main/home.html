@@ -1,0 +1,80 @@
+{% extends "main/base.html" %}
+
+{% block title %}Home - Gibly{% endblock %}
+
+{% block content %}
+<div class="feed-container">
+    {% if query %}
+        <h3>Search results for "{{ query }}"</h3>
+        {% if users %}
+            <div class="search-users">
+                <h4>Users</h4>
+                <ul>
+                    {% for user in users %}
+                    <li>
+                        <a href="{% url 'profile_by_username' user.username %}">
+                            <img src="{{ user.profile.profile_picture.url|default:'https://i.pravatar.cc/40' }}" alt="{{ user.username }}" class="search-user-avatar" style="width:32px;height:32px;border-radius:50%;vertical-align:middle;">
+                            <span>{{ user.username }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <!-- Posts results will show as usual below -->
+    {% endif %}
+    <div class="posts-results">
+        {% for post in posts %}
+        <div class="post-card">
+            <div class="post-header">
+                <img src="{{ post.user.profile.profile_picture.url }}" alt="Profile" class="post-profile-pic">
+                <div>
+                    <span class="post-username">{{ post.user.username }}</span>
+                    <span class="post-date">{{ post.created_at|date:"d M Y H:i" }}</span>
+                </div>
+            </div>
+            <div class="post-image-container">
+                <img src="{{ post.image.url }}" alt="Post Image" class="post-image">
+            </div>
+            <p class="post-caption">{{ post.caption }}</p>
+            <div class="post-actions">
+                <button class="like-btn{% if post.liked_by_user %} liked{% endif %}" data-post-id="{{ post.id }}">
+                    <i class="fas fa-heart"></i>
+                    <span class="like-count">{{ post.like_count|default:0 }}</span>
+                </button>
+                <button class="comment-btn" data-post-id="{{ post.id }}">
+                    <i class="fas fa-comment"></i>
+                    <span>Comment</span>
+                    <span class="comment-count" style="margin-left: 5px;">{{ post.comment_set.count|default:0 }}</span>
+                    {% if post.commented_by_user %}
+                        <span title="You commented" style="color: green; font-weight: bold; margin-left: 5px;">&#10003;</span>
+                    {% endif %}
+                </button>
+            </div>
+            <div class="comments-section" id="comments-{{ post.id }}" style="display:none;">
+                {% for comment in post.comments.all %}
+                    <div class="comment">
+                        <strong>{{ comment.user.username }}</strong>: {{ comment.text }}
+                    </div>
+                {% empty %}
+                    <div class="comment">No comments yet.</div>
+                {% endfor %}
+                {% if user.is_authenticated %}
+                <form method="post" class="add-comment-form" style="margin-top:10px;">
+                    {% csrf_token %}
+                    <div style="display:flex;gap:8px;">
+                        <input type="text" name="content" placeholder="Add a comment..." required style="flex:1; border-radius:6px; border:1px solid #ccc; padding:7px 10px;">
+                        <button type="submit" class="btn-primary" style="padding:7px 16px;">Post</button>
+                    </div>
+                </form>
+                {% else %}
+                <div style="margin-top:10px;font-size:0.98em;">Please <a href="{% url 'login' %}">login</a> to comment.</div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+            <p>No posts yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "main/base.html" %}
+{% block title %}Login - Gibly{% endblock %}
+
+{% block header %}
+    <div class="top-header">
+        <a href="{% url 'home' %}" class="logo">Gibly</a>
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+<h2>Login</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="Submit">Login</button>
+</form>
+<p>Don't have an account? <a href="{% url 'register' %}">Register here</a>.</p>
+
+{% if user.is_authenticated %}
+<p>Welcome back, {{ user.username }}!</p>
+<a href="{% url 'logout' %}">Logout</a>
+{% endif %}
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

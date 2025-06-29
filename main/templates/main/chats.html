@@ -1,0 +1,72 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block title %}Chats – Gibly{% endblock %}
+
+{% block content %}
+<div class="chat-wrapper">
+
+    <!-- ─────────────── Sidebar – contacts list ─────────────── -->
+    <aside class="chat-sidebar">
+        <div class="chat-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search">
+        </div>
+
+        <!-- Loop over friends to display chat contacts -->
+        {% for friend in friends %}
+        <a href="{% url 'chats' %}?to={{ friend.username }}" class="chat-contact {% if active_friend and friend.id == active_friend.id %}active{% endif %}">
+            <img src="{% if friend.profile.profile_picture %}{{ friend.profile.profile_picture.url }}{% else %}{% static 'main/img/default_avatar.jpg' %}{% endif %}" alt="Avatar">
+            <div class="chat-contact-info">
+                <h4>{{ friend.username }}</h4>
+                <!-- Optionally, add last message preview here -->
+            </div>
+            <!-- Optionally, add last message time here -->
+        </a>
+        {% empty %}
+        <p>No friends to chat with.</p>
+        {% endfor %}
+
+        <!-- add-new btn -->
+        <button id="chatNewBtn" class="chat-new-btn"><i class="fas fa-plus"></i></button>
+    </aside>
+
+    <!-- ─────────────── Chat panel – active thread ─────────────── -->
+    <section class="chat-panel">
+        <header class="chat-panel-header">
+            <h3 class="chat-recipient">{% if active_friend %}{{ active_friend.username }}{% else %}Select a chat{% endif %}</h3>
+            <i class="fas fa-trash-alt chat-delete"></i>
+        </header>
+
+        <div class="chat-messages" id="chatMessages">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="bubble-row {% if message.sender == user %}bubble-row-right{% endif %}">
+                        {% if message.sender != user %}
+                        <img src="{% if message.sender.profile.profile_picture %}{{ message.sender.profile.profile_picture.url }}{% else %}{% static 'main/img/default_avatar.jpg' %}{% endif %}" class="bubble-avatar" alt="">
+                        {% endif %}
+                        <div class="bubble {% if message.sender == user %}bubble-right{% else %}bubble-left{% endif %}">
+                            {{ message.text|linebreaksbr }}
+                            <span class="bubble-date">{{ message.created_at|date:"M d" }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No messages yet. Start the conversation!</p>
+            {% endif %}
+        </div>
+
+        <!-- message input bar -->
+        <form class="chat-input-bar" method="POST" id="chatInputForm">
+            {% csrf_token %}
+            <label class="attach-label">
+                <i class="fas fa-paperclip"></i>
+                <input type="file" hidden>
+            </label>
+            <input type="text" name="message" placeholder="type a message" autocomplete="off" id="chatMessageInput" {% if not active_friend %}disabled{% endif %}>
+            <button type="submit" class="send-btn" {% if not active_friend %}disabled{% endif %}><i class="fas fa-paper-plane"></i></button>
+        </form>
+    </section>
+
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "main/base.html" %}
+
+{% block title %}{{ post.user.username }}'s Post - Gibly{% endblock %}
+
+{% block content %}
+<div class="post-detail-container">
+    <div class="post-card">
+        <div class="post-header">
+            <img src="{{ post.user.profile.profile_picture.url }}" alt="Profile" class="post-profile-pic">
+            <div>
+                <span class="post-username">{{ post.user.username }}</span>
+                <span class="post-date">{{ post.created_at|date:"d M Y H:i" }}</span>
+            </div>
+        </div>
+        {% if post.image %}
+            <img src="{{ post.image.url }}" alt="Post Image" class="post-main-image">
+        {% endif %}
+        <p class="post-caption">{{ post.caption }}</p>
+        <div class="post-actions">
+            <button class="like-btn{% if user in post.likes.all %} liked{% endif %}" data-post-id="{{ post.id }}">
+                <i class="fas fa-heart"></i>
+                <span class="like-count">{{ post.likes.count }}</span>
+            </button>
+            <button class="comment-btn" data-post-id="{{ post.id }}">
+                <i class="fas fa-comment"></i>
+                <span>Comment</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Comment Section -->
+    <div class="comments-section" id="comments-{{ post.id }}" style="display:block;">
+        <h3>Comments</h3>
+        {% for comment in post.comment_set.all %}
+            <div class="comment">
+                <strong>{{ comment.user.username }}</strong>: {{ comment.content }}
+            </div>
+        {% empty %}
+            <div class="comment">No comments yet.</div>
+        {% endfor %}
+
+        {% if user.is_authenticated %}
+        <form method="post" class="add-comment-form" style="margin-top:18px;">
+            {% csrf_token %}
+            <textarea name="content" rows="2" placeholder="Add a comment..." required style="width:100%;border-radius:6px;padding:8px;"></textarea>
+            <button type="submit" class="btn-primary" style="margin-top:8px;">Post Comment</button>
+        </form>
+        {% else %}
+        <p style="margin-top:18px;">Please <a href="{% url 'login' %}">login</a> to comment.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

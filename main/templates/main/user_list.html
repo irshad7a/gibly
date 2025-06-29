@@ -1,0 +1,16 @@
+<h2>All Users</h2>
+{% for u in users %}
+ <p><strong>{{ u.username }}</strong></p>
+ {% if u.id in following %}
+ <form method="post" action="{% url 'unfollow' u.id %}">
+  {% csrf_token %}
+    <button type="submit">Unfollow</button>
+    </form>
+{% else %}
+ <form method="post" action="{% url 'follow' u.id %}">
+  {% csrf_token %}
+    <button type="submit">Follow</button>
+    </form>
+{% endif %}
+{% endfor %}
+<a href="{% url 'home' %}">Back to Home</a>
